@@ -1,6 +1,6 @@
-package com.arkaces.btc_ark_channel_service.transfer;
+package com.arkaces.ark_eth_channel_service.transfer;
 
-import com.arkaces.btc_ark_channel_service.contract.ContractEntity;
+import com.arkaces.ark_eth_channel_service.contract.ContractEntity;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -19,27 +19,27 @@ public class TransferEntity {
     private String id;
     private LocalDateTime createdAt;
     private String status;
-    private String btcTransactionId;
-
-    @Column(precision = 20, scale = 8)
-    private BigDecimal btcAmount;
-
-    @Column(precision = 20, scale = 8)
-    private BigDecimal btcToArkRate;
-
-    @Column(precision = 20, scale = 8)
-    private BigDecimal btcFlatFee;
-
-    @Column(precision = 20, scale = 8)
-    private BigDecimal btcPercentFee;
-
-    @Column(precision = 20, scale = 8)
-    private BigDecimal btcTotalFee;
-
-    @Column(precision = 20, scale = 8)
-    private BigDecimal arkSendAmount;
-
     private String arkTransactionId;
+
+    @Column(precision = 20, scale = 8)
+    private BigDecimal arkAmount;
+
+    @Column(precision = 20, scale = 8)
+    private BigDecimal arkToEthRate;
+
+    @Column(precision = 20, scale = 8)
+    private BigDecimal arkFlatFee;
+
+    @Column(precision = 20, scale = 8)
+    private BigDecimal arkPercentFee;
+
+    @Column(precision = 20, scale = 8)
+    private BigDecimal arkTotalFee;
+
+    private String ethTransactionId;
+
+    @Column(precision = 20, scale = 8)
+    private BigDecimal ethSendAmount;
 
     @ManyToOne(cascade = CascadeType.ALL)
     private ContractEntity contractEntity;

@@ -1,4 +1,4 @@
-package com.arkaces.btc_ark_channel_service;
+package com.arkaces.ark_eth_channel_service;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 @Component
 @ConfigurationProperties(prefix = "fees")
 public class FeeSettings {
-    private BigDecimal btcFlatFee;
-    private BigDecimal btcPercentFee;
+
+    private BigDecimal arkFlatFee;
+    private BigDecimal arkPercentFee;
 }

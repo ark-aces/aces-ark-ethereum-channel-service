@@ -4,12 +4,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.arkaces</groupId>
-	<artifactId>btc_ark_channel_service</artifactId>
+	<artifactId>ark_eth_channel_service</artifactId>
 	<version>1.0.0</version>
 	<packaging>jar</packaging>
 
-	<name>ark_btc_channel_service</name>
-	<description>ACES ARK-BTC Channel Service</description>
+	<name>ark_eth_channel_service</name>
+	<description>ACES ARK-ETH Channel Service</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -33,7 +33,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
@@ -44,7 +43,6 @@
 			<artifactId>postgresql</artifactId>
 			<version>9.1-901.jdbc4</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
@@ -83,7 +81,7 @@
 		<dependency>
 			<groupId>com.arkaces</groupId>
 			<artifactId>aces_server_lib</artifactId>
-			<version>5.4.0</version>
+			<version>5.5.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.arkaces</groupId>
@@ -100,5 +98,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>

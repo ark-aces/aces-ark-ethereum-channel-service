@@ -1,4 +1,4 @@
-package com.arkaces.btc_ark_channel_service.exchange_rate;
+package com.arkaces.ark_eth_channel_service.exchange_rate;
 
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
@@ -10,8 +10,8 @@ import java.math.BigDecimal;
 import java.util.Map;
 
 @Service
-public class ExchangeRateService
-{
+public class ExchangeRateService {
+
     private final RestTemplate restTemplate = new RestTemplateBuilder()
         .rootUri("https://min-api.cryptocompare.com/data/")
         .build();

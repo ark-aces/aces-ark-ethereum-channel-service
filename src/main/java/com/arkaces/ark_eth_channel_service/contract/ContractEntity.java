@@ -1,6 +1,6 @@
-package com.arkaces.btc_ark_channel_service.contract;
+package com.arkaces.ark_eth_channel_service.contract;
 
-import com.arkaces.btc_ark_channel_service.transfer.TransferEntity;
+import com.arkaces.ark_eth_channel_service.transfer.TransferEntity;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -22,14 +22,11 @@ public class ContractEntity {
     private String status;
     private LocalDateTime createdAt;
     private LocalDateTime expiresAt;
-    private String recipientArkAddress;
-    private String depositBtcAddress;
+    private String recipientEthAddress;
+    private String depositArkAddress;
     private String subscriptionId;
-    
-    // todo store password encrypted in db
-    private String depositBtcPassphrase;
+    private String depositArkPrivateKey; // TODO: Store password encrypted in db
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "contractEntity")
     private List<TransferEntity> transferEntities = new ArrayList<>();
-    
 }

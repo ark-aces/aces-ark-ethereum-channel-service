@@ -1,4 +1,4 @@
-package com.arkaces.btc_ark_channel_service;
+package com.arkaces.ark_eth_channel_service;
 
 import ark_java_client.*;
 import com.arkaces.ApiClient;
@@ -25,22 +25,18 @@ public class ApplicationConfig {
         ArkNetworkFactory arkNetworkFactory = new ArkNetworkFactory();
         String arkNetworkConfigPath = environment.getProperty("arkNetworkConfigPath");
         ArkNetwork arkNetwork = arkNetworkFactory.createFromYml(arkNetworkConfigPath);
-
         HttpArkClientFactory httpArkClientFactory = new HttpArkClientFactory();
         return httpArkClientFactory.create(arkNetwork);
     }
 
     @Bean
-    public AcesListenerApi bitcoinListener(Environment environment) {
+    public AcesListenerApi arkListener(Environment environment) {
         ApiClient apiClient = new ApiClient();
-        apiClient.setBasePath(environment.getProperty("bitcoinListener.url"));
-        if (environment.containsProperty("bitcoinListener.apikey")) {
+        apiClient.setBasePath(environment.getProperty("arkListener.url"));
+        if (environment.containsProperty("arkListener.apikey")) {
             apiClient.setUsername("token");
-            apiClient.setPassword(environment.getProperty("bitcoinListener.apikey"));
+            apiClient.setPassword(environment.getProperty("arkListener.apikey"));
         }
-
         return new AcesListenerApi(apiClient);
     }
-
-
 }

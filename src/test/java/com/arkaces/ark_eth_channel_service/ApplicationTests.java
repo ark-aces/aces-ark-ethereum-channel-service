@@ -1,16 +1,15 @@
-package com.arkaces.btc_ark_channel_service;
+package com.arkaces.ark_eth_channel_service;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
+@RunWith(SpringRunner.class)
 public class ApplicationTests {
 
 	@Test
 	public void contextLoads() {
 	}
-
 }

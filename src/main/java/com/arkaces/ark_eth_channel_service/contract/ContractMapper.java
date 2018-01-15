@@ -1,7 +1,7 @@
-package com.arkaces.btc_ark_channel_service.contract;
+package com.arkaces.ark_eth_channel_service.contract;
 
 import com.arkaces.aces_server.aces_service.contract.Contract;
-import com.arkaces.btc_ark_channel_service.transfer.TransferMapper;
+import com.arkaces.ark_eth_channel_service.transfer.TransferMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,8 +23,8 @@ public class ContractMapper {
         contract.setStatus(contractEntity.getStatus());
         
         Results results = new Results();
-        results.setDepositBtcAddress(contractEntity.getDepositBtcAddress());
-        results.setRecipientArkAddress(contractEntity.getRecipientArkAddress());
+        results.setDepositArkAddress(contractEntity.getDepositArkAddress());
+        results.setRecipientEthAddress(contractEntity.getRecipientEthAddress());
         results.setTransfers(
             contractEntity.getTransferEntities().stream()
                 .map(transferMapper::map)

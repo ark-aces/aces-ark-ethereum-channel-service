@@ -1,9 +1,9 @@
 serverInfo:
-  name: "Aces BTC-ARK Channel Service"
-  description: "ACES BTC to ARK Channel service for transferring BTC to ARK"
+  name: "Aces ARK-ETH Channel Service"
+  description: "ACES ARK-ETH Channel service for transferring ARK to ETH"
   instructions: >
-    After this contract is executed, any BTC sent to depositBtcAddress will be exchanged for ARK and 
-    sent directly to the given recipientArkAddress less service fees.
+    After this contract is executed, any ARK sent to depositArkAddress will be exchanged for ETH and
+    sent directly to the given recipientEthAddress less service fees.
   version: "1.0.0"
   websiteUrl: "https://arkaces.com"
   flatFee: "0"
@@ -12,46 +12,52 @@ serverInfo:
     {
       "type": "object",
       "properties": {
-        "recipientArkAddress": {
+        "recipientEthAddress": {
           "type": "string"
         }
       },
       "required": [
-        "recipientArkAddress"
+        "recipientEthAddress"
       ]
     }
   outputSchema: >
     {
       "type": "object",
       "properties": {
-        "depositBtcAddress": {
+        "depositArkAddress": {
           "type": "string"
         },
-        "recipientArkAddress": {
+        "recipientEthAddress": {
           "type": "string"
         },
         "transfers": {
           "type": "array",
           "properties": {
-            "btcAmount": {
-              "type": "string"
-            },
-            "btcToArkRate": {
-              "type": "string"
-            },
-            "btcFlatFee": {
-              "type": "string"
-            },
-            "btcPercentFee": {
-              "type": "string"
-            },
-            "btcTotalFee": {
-              "type": "string"
-            },
-            "arkSendAmount": {
+            "id": {
               "type": "string"
             },
             "arkTransactionId": {
+              "type": "string"
+            },
+            "arkAmount": {
+              "type": "string"
+            },
+            "arkToEthRate": {
+              "type": "string"
+            },
+            "arkFlatFee": {
+              "type": "string"
+            },
+            "arkPercentFee": {
+              "type": "string"
+            },
+            "arkTotalFee": {
+              "type": "string"
+            },
+            "ethTransactionId": {
+              "type": "string"
+            },
+            "ethSendAmount": {
               "type": "string"
             },
             "createdAt": {
@@ -64,7 +70,7 @@ serverInfo:
 
 #spring:
 #  datasource:
-#    url: "jdbc:h2:/tmp/btc_ark_channel_service.db;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE"
+#    url: "jdbc:h2:/tmp/ark_eth_channel_service.db;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE"
 #    driver-class-name: "org.h2.Driver"
 #  jpa:
 #    hibernate:
@@ -74,7 +80,7 @@ serverInfo:
 #spring:
 #  datasource:
 #    platform: postgres
-#    url: jdbc:postgresql://localhost:5432/aces_btc_ark_channel_db
+#    url: jdbc:postgresql://localhost:5432/aces_ark_eth_channel_db
 #    username: service_user
 #    password: password
 #  jpa:
@@ -86,17 +92,17 @@ serverInfo:
 
 arkNetworkConfigPath: "ark_network_config/testnet.yml"
 
-serviceArkAccount:
+serviceEthAccount:
   address: AewU1vEmPrtQNjdVo33cX84bfovY3jNAkV
   passphrase: change-me
 
 fees:
-  btcFlatFee: 0
-  btcPercentFee: 1
+  arkFlatFee: 0
+  arkPercentFee: 1
 
 server:
   port: 9190
-  
-bitcoinListener:
-  url: https://btc-listener-mainnet.arkaces.com/
+
+arkListener:
+  url: https://ark-listener-mainnet.arkaces.com/ # TODO https://github.com/ark-aces/aces-listener-ark
   apiKey: change-me
