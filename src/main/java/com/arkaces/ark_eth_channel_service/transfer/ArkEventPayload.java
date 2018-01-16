@@ -4,12 +4,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-class ArkEvent {
+class ArkEventPayload {
 
     private String id;
     private String transactionId;
+
     @JsonProperty("data")
     private ArkTransaction transaction;
+
     private String subscriptionId;
     private String createdAt;
 }

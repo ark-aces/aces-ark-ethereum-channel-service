@@ -1,12 +1,12 @@
 package com.arkaces.ark_eth_channel_service.transfer;
 
-import ark_java_client.ArkClient;
 import com.arkaces.aces_server.common.identifer.IdentifierGenerator;
 import com.arkaces.ark_eth_channel_service.FeeSettings;
 import com.arkaces.ark_eth_channel_service.ServiceEthAccountSettings;
 import com.arkaces.ark_eth_channel_service.ark.ArkSatoshiService;
 import com.arkaces.ark_eth_channel_service.contract.ContractEntity;
 import com.arkaces.ark_eth_channel_service.contract.ContractRepository;
+import com.arkaces.ark_eth_channel_service.ethereum.EthereumService;
 import com.arkaces.ark_eth_channel_service.exchange_rate.ExchangeRateService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,23 +32,23 @@ public class ArkEventHandler {
     private final ArkSatoshiService arkSatoshiService;
     private final ServiceEthAccountSettings serviceEthAccountSettings;
     private final FeeSettings feeSettings;
+    private final EthereumService ethereumService;
 
     @PostMapping("/arkEvents")
-    public ResponseEntity<Void> handleArkEvent(@RequestBody ArkEvent event) {
-        // todo: verify event post is signed by listener
-        String arkTransactionId = event.getTransactionId();
-        ArkTransaction transaction = event.getTransaction();
-        
-        log.info("Received Ark event: " + arkTransactionId + " -> " + transaction.toString());
-        
-        String subscriptionId = event.getSubscriptionId();
+    public ResponseEntity<Void> handleArkEvent(@RequestBody ArkEventPayload eventPayload) {
+        // TODO: Verify event post is signed by listener.
+        String arkTransactionId = eventPayload.getTransactionId();
+        ArkTransaction transaction = eventPayload.getTransaction();
+
+        log.info("Received ark event: {} -> {}", arkTransactionId, transaction.toString());
+
+        String subscriptionId = eventPayload.getSubscriptionId();
         ContractEntity contractEntity = contractRepository.findOneBySubscriptionId(subscriptionId);
         if (contractEntity != null) {
-            // todo: lock contract for update to prevent concurrent processing of a listener transaction.
-            // Listeners send events serially, so that shouldn't be an issue, but we might want to lock
-            // to be safe.
+            // TODO: Lock contract for update to prevent concurrent processing of a listener transaction.
+            // Listeners send events serially, so that shouldn't be an issue, but we might want to lock to be safe.
 
-            log.info("Matched event for contract id " + contractEntity.getId() + " ark transaction id " + arkTransactionId);
+            log.info("Matched event for contract id {}, ark transaction id {}", contractEntity.getId(), arkTransactionId);
 
             String transferId = identifierGenerator.generate();
 
@@ -82,27 +82,34 @@ public class ArkEventHandler {
             transferEntity.setEthSendAmount(ethSendAmount);
 
             transferEntity.setStatus(TransferStatus.NEW);
+
             transferRepository.save(transferEntity);
+
+            // TODO: Make sure service wallet has enough funds. This should really be done when creating the service contract to avoid the need for a rollback.
 
             // Send eth transaction
-            String ethTransactionId = ""; // TODO
-//            String ethTransactionId = arkClient.broadcastTransaction(
-//                    contractEntity.getRecipientEthAddress(),
-//                    ethSendSatoshis,
-//                    null,
-//                    serviceEthAccountSettings.getPassphrase()
-//            );
+            String ethTransactionId = ethereumService.sendTransaction(
+                    serviceEthAccountSettings.getAddress(),
+                    contractEntity.getRecipientEthAddress(),
+                    ethSendAmount
+            );
+
             transferEntity.setEthTransactionId(ethTransactionId);
 
-            log.info("Sent " + ethSendAmount + " ETH to " + contractEntity.getRecipientEthAddress()
-                + ", ETH transaction id " + ethTransactionId + ", ARK transaction " + arkTransactionId);
+            log.info("Sent {} ETH to {}, eth transaction id {}, ark transaction id {}",
+                    ethSendAmount.toPlainString(),
+                    contractEntity.getRecipientEthAddress(),
+                    ethTransactionId,
+                    arkTransactionId
+            );
 
             transferEntity.setStatus(TransferStatus.COMPLETE);
+
             transferRepository.save(transferEntity);
-            
-            log.info("Saved transfer id " + transferEntity.getId() + " to contract " + contractEntity.getId());
+
+            log.info("Saved transfer id {} to contract {}", transferEntity.getId(), contractEntity.getId());
         }
-        
+
         return ResponseEntity.ok().build();
     }
 }
