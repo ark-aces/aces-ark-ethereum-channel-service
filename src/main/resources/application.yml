@@ -70,12 +70,13 @@ serverInfo:
 
 #spring:
 #  datasource:
-#    url: "jdbc:h2:/tmp/ark_eth_channel_service.db;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE"
 #    driver-class-name: "org.h2.Driver"
-#  jpa:
+#    url: "jdbc:h2:~/tmp/ark_eth_channel_service.db;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE"
+#  database:
 #    hibernate:
-#      ddl-auto: "create-drop"
-
+#      ddl-auto: "validate"
+#  jpa:
+#      database-platform: org.hibernate.dialect.H2Dialect
 
 #spring:
 #  datasource:
@@ -93,8 +94,7 @@ serverInfo:
 arkNetworkConfigPath: "ark_network_config/testnet.yml"
 
 serviceEthAccount:
-  address: AewU1vEmPrtQNjdVo33cX84bfovY3jNAkV
-  passphrase: change-me
+  address: "change-me"
 
 fees:
   arkFlatFee: 0
@@ -104,5 +104,10 @@ server:
   port: 9190
 
 arkListener:
-  url: https://ark-listener-mainnet.arkaces.com/ # TODO https://github.com/ark-aces/aces-listener-ark
-  apiKey: change-me
+  url: "https://ark-listener-mainnet.arkaces.com/"
+
+arkEventCallbackUrl: "http://localhost:9190/arkEvents"
+
+arkMinConfirmations: 5
+
+ethRpcRootUri: "http://127.0.0.1:8545"

@@ -6,21 +6,24 @@ import com.arkaces.aces_server.aces_service.contract.Contract;
 import com.arkaces.aces_server.aces_service.contract.ContractStatus;
 import com.arkaces.aces_server.aces_service.contract.CreateContractRequest;
 import com.arkaces.aces_server.aces_service.error.ServiceErrorCodes;
+import com.arkaces.aces_server.common.api_key_generation.ApiKeyGenerator;
 import com.arkaces.aces_server.common.error.NotFoundException;
 import com.arkaces.aces_server.common.identifer.IdentifierGenerator;
+import io.ark.core.Crypto;
 import io.swagger.client.model.Subscription;
 import io.swagger.client.model.SubscriptionRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.bitcoinj.core.ECKey;
-import org.spongycastle.util.encoders.Hex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 
-@RestController
+@Slf4j
 @Transactional
+@RestController
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ContractController {
     
@@ -28,26 +31,31 @@ public class ContractController {
     private final ContractRepository contractRepository;
     private final ContractMapper contractMapper;
     private final AcesListenerApi arkListener;
+    private final String arkEventCallbackUrl;
+    private final Integer arkMinConfirmations;
+    private final ApiKeyGenerator apiKeyGenerator;
     
     @PostMapping("/contracts")
     public Contract<Results> postContract(@RequestBody CreateContractRequest<Arguments> createContractRequest) {
         ContractEntity contractEntity = new ContractEntity();
-        contractEntity.setCorrelationId(createContractRequest.getCorrelationId());
-        contractEntity.setCreatedAt(LocalDateTime.now());
         contractEntity.setId(identifierGenerator.generate());
+        contractEntity.setCorrelationId(createContractRequest.getCorrelationId());
         contractEntity.setStatus(ContractStatus.EXECUTED);
+        contractEntity.setCreatedAt(LocalDateTime.now());
+        contractEntity.setRecipientEthAddress(createContractRequest.getArguments().getRecipientEthAddress());
 
         // Generate ark wallet for deposits
-        ECKey key = new ECKey();
-        String depositArkAddress = Hex.toHexString(key.getPubKeyHash());
+        String depositArkPassphrase = apiKeyGenerator.generate();
+        contractEntity.setDepositArkPassphrase(depositArkPassphrase);
+        ECKey key = Crypto.getKeys(depositArkPassphrase);
+        String depositArkAddress = Crypto.getAddress(key);
         contractEntity.setDepositArkAddress(depositArkAddress);
-        String depositArkPrivateKey = Hex.toHexString(key.getPrivKeyBytes());
-        contractEntity.setDepositArkPrivateKey(depositArkPrivateKey);
+        log.info("Deposit Ark Address: {} --- Deposit Ark Passphrase: {}", depositArkAddress, depositArkPassphrase);
 
         // Subscribe to ark listener on deposit ark address
         SubscriptionRequest subscriptionRequest = new SubscriptionRequest();
-        subscriptionRequest.setCallbackUrl(depositArkAddress);
-        subscriptionRequest.setMinConfirmations(2);
+        subscriptionRequest.setCallbackUrl(arkEventCallbackUrl);
+        subscriptionRequest.setMinConfirmations(arkMinConfirmations);
         subscriptionRequest.setRecipientAddress(depositArkAddress);
         Subscription subscription;
         try {
@@ -58,6 +66,8 @@ public class ContractController {
         contractEntity.setSubscriptionId(subscription.getId());
 
         contractRepository.save(contractEntity);
+
+        log.info("Contract Entity: {}", contractEntity);
 
         return contractMapper.map(contractEntity);
     }

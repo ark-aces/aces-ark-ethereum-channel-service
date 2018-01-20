@@ -6,9 +6,8 @@ import org.springframework.stereotype.Component;
 
 @Data
 @Component
-@ConfigurationProperties(prefix = "serviceArkAccount")
+@ConfigurationProperties(prefix = "serviceEthAccount")
 public class ServiceEthAccountSettings {
 
     private String address;
-    private String passphrase;
 }

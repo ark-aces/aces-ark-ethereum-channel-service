@@ -10,4 +10,7 @@ Vagrant.configure("2") do |config|
   
   # ark node api
   config.vm.network "forwarded_port", guest: 4001, host: 4001
+
+  # eth rpc
+  config.vm.network "forwarded_port", guest: 8545, host: 8545
 end

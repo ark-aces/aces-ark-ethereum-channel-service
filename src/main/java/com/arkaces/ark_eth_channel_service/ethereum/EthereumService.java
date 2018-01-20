@@ -1,11 +1,9 @@
 package com.arkaces.ark_eth_channel_service.ethereum;
 
 import com.arkaces.aces_server.common.json.NiceObjectMapper;
-import com.arkaces.ark_eth_channel_service.utils.ByteUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.binary.Hex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -16,7 +14,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 
@@ -25,28 +22,47 @@ import java.util.List;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class EthereumService {
 
-    private final RestTemplate ethereumRpcRestTemplate;
     private final EthereumWeiService ethereumWeiService;
-    private final EthereumRpcRequestFactory ethereumRpcRequestFactory = new EthereumRpcRequestFactory();
     private final NiceObjectMapper objectMapper = new NiceObjectMapper(new ObjectMapper());
+    private final EthereumRpcRequestFactory ethereumRpcRequestFactory = new EthereumRpcRequestFactory();
+    private final RestTemplate ethereumRpcRestTemplate;
 
-    public String sendTransaction(String senderAddress, String recipientAddress, BigDecimal etherValue) {
+    public String sendTransaction(String from, String to, BigDecimal etherValue) {
+        Long wei = ethereumWeiService.toWei(etherValue);
+        String value = getHexStringFromWei(wei);
         SendTransaction sendTransaction = SendTransaction.builder()
-                .from(Hex.encodeHexString(senderAddress.getBytes(StandardCharsets.UTF_8)))
-                .to(Hex.encodeHexString(recipientAddress.getBytes(StandardCharsets.UTF_8)))
-                .value(Hex.encodeHexString(ByteUtils.longToBytesNoLeadingZeros(ethereumWeiService.toWei(etherValue))))
+                .from(from)
+                .to(to)
+                .value(value)
                 .build();
         HttpEntity<String> requestEntity = getRequestEntity("eth_sendTransaction", Collections.singletonList(sendTransaction));
-        return hexToAscii(
-                ethereumRpcRestTemplate.exchange(
-                        "/",
-                        HttpMethod.POST,
-                        requestEntity,
-                        new ParameterizedTypeReference<EthereumRpcResponse<String>>() {}
-                )
-                .getBody()
-                .getResult()
-        );
+        return ethereumRpcRestTemplate.exchange(
+                "/",
+                HttpMethod.POST,
+                requestEntity,
+                new ParameterizedTypeReference<EthereumRpcResponse<String>>() {}
+        ).getBody().getResult();
+    }
+
+    private String getHexStringFromWei(Long wei) {
+        return "0x" + removeLeadingZeros(Long.toHexString(wei));
+    }
+
+    private String removeLeadingZeros(String s) {
+        int index = findFirstNonZeroIndex(s);
+        if (index == -1) {
+            return "0";
+        }
+        return s.substring(index);
+    }
+
+    private int findFirstNonZeroIndex(String s) {
+        for (int i = 0; i < s.length(); i++) {
+            if (s.charAt(i) != '0') {
+                return i;
+            }
+        }
+        return -1;
     }
 
     private HttpEntity<String> getRequestEntity(String method, List<Object> params) {
@@ -57,16 +73,5 @@ public class EthereumService {
         String body = objectMapper.writeValueAsString(ethereumRpcRequest);
 
         return new HttpEntity<>(body, headers);
-    }
-
-    private String hexToAscii(String hexStr) {
-        StringBuilder output = new StringBuilder("");
-
-        for (int i = 0; i < hexStr.length(); i += 2) {
-            String str = hexStr.substring(i, i + 2);
-            output.append((char) Integer.parseInt(str, 16));
-        }
-
-        return output.toString();
     }
 }

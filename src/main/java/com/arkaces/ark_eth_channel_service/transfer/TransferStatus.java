@@ -1,8 +1,15 @@
 package com.arkaces.ark_eth_channel_service.transfer;
 
-public class TransferStatus {
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-    public static final String NEW = "new";
-    public static final String COMPLETE = "complete";
-    public static final String FAILED = "failed";
+@AllArgsConstructor
+public enum TransferStatus {
+
+    NEW("new"),
+    COMPLETE("complete"),
+    FAILED("failed");
+
+    @Getter
+    private String status;
 }

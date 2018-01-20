@@ -81,11 +81,11 @@ public class ArkEventHandler {
             }
             transferEntity.setEthSendAmount(ethSendAmount);
 
-            transferEntity.setStatus(TransferStatus.NEW);
+            transferEntity.setStatus(TransferStatus.NEW.getStatus());
 
             transferRepository.save(transferEntity);
 
-            // TODO: Make sure service wallet has enough funds. This should really be done when creating the service contract to avoid the need for a rollback.
+            // TODO: Make sure service wallet has enough funds.
 
             // Send eth transaction
             String ethTransactionId = ethereumService.sendTransaction(
@@ -94,16 +94,27 @@ public class ArkEventHandler {
                     ethSendAmount
             );
 
-            transferEntity.setEthTransactionId(ethTransactionId);
+            // Check if eth transaction was successful
+            if (ethTransactionId != null) {
+                transferEntity.setEthTransactionId(ethTransactionId);
 
-            log.info("Sent {} ETH to {}, eth transaction id {}, ark transaction id {}",
-                    ethSendAmount.toPlainString(),
-                    contractEntity.getRecipientEthAddress(),
-                    ethTransactionId,
-                    arkTransactionId
-            );
+                log.info("Sent {} ETH to {}, eth transaction id {}, ark transaction id {}",
+                        ethSendAmount.toPlainString(),
+                        contractEntity.getRecipientEthAddress(),
+                        ethTransactionId,
+                        arkTransactionId
+                );
 
-            transferEntity.setStatus(TransferStatus.COMPLETE);
+                transferEntity.setStatus(TransferStatus.COMPLETE.getStatus());
+            } else {
+                log.error("Failed to send {} ETH to {}, ark transaction id {}",
+                        ethSendAmount.toPlainString(),
+                        contractEntity.getRecipientEthAddress(),
+                        arkTransactionId
+                );
+
+                transferEntity.setStatus(TransferStatus.FAILED.getStatus());
+            }
 
             transferRepository.save(transferEntity);
 

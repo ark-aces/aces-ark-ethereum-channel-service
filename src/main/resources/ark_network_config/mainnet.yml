@@ -140,7 +140,7 @@ seedPeers:
   -
     hostname: 193.70.72.90
     port: 4001
-    
+
 trustedPeers:
   -
     hostname: 127.0.0.1
