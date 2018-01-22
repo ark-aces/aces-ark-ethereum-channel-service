@@ -1,8 +1,14 @@
 CREATE TABLE contracts (
   pid BIGSERIAL PRIMARY KEY,
   id VARCHAR(255) NOT NULL,
-  recipientEthAddress
-  created_at TIMESTAMP
+  correlation_id VARCHAR(255),
+  status VARCHAR(255),
+  created_at TIMESTAMP,
+  expires_at TIMESTAMP,
+  recipient_ark_address VARCHAR(255),
+  deposit_eth_address VARCHAR(255),
+  deposit_eth_passphrase VARCHAR(255),
+  subscription_id VARCHAR(255)
 );
 
 CREATE TABLE transfers (

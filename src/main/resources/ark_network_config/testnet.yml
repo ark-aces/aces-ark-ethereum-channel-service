@@ -9,4 +9,3 @@ trustedPeers:
   -
     hostname: 173.230.156.179
     port: 4001
-

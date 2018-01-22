@@ -57,6 +57,7 @@ public class ContractController {
         subscriptionRequest.setCallbackUrl(arkEventCallbackUrl);
         subscriptionRequest.setMinConfirmations(arkMinConfirmations);
         subscriptionRequest.setRecipientAddress(depositArkAddress);
+
         Subscription subscription;
         try {
             subscription = arkListener.subscriptionsPost(subscriptionRequest);

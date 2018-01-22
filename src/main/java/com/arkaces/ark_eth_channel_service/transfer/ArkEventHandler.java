@@ -50,9 +50,8 @@ public class ArkEventHandler {
 
             log.info("Matched event for contract id {}, ark transaction id {}", contractEntity.getId(), arkTransactionId);
 
-            String transferId = identifierGenerator.generate();
-
             TransferEntity transferEntity = new TransferEntity();
+            String transferId = identifierGenerator.generate();
             transferEntity.setId(transferId);
             transferEntity.setCreatedAt(LocalDateTime.now());
             transferEntity.setArkTransactionId(arkTransactionId);
