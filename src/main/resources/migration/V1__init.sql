@@ -5,9 +5,9 @@ CREATE TABLE contracts (
   status VARCHAR(255),
   created_at TIMESTAMP,
   expires_at TIMESTAMP,
-  recipient_ark_address VARCHAR(255),
-  deposit_eth_address VARCHAR(255),
-  deposit_eth_passphrase VARCHAR(255),
+  recipient_eth_address VARCHAR(255),
+  deposit_ark_address VARCHAR(255),
+  deposit_ark_passphrase VARCHAR(255),
   subscription_id VARCHAR(255)
 );
 
