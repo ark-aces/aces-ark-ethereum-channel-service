@@ -83,19 +83,18 @@ Create a new Service Contract:
 curl -X POST localhost:9190/contracts \
 -H 'Content-type: application/json' \
 -d '{
-  "recipientEthAddress": "ARNJJruY6RcuYCXcwWsu4bx9kyZtntqeAx"
+  "recipientEthAddress": "0xcfd866733c2192311add9836f0e0cf50daba16a7"
 }' 
 ```
 
 ```json
 {
-  "id": "abe05cd7-40c2-4fb0-a4a7-8d2f76e74978",
-  "createdAt": "2017-07-04T21:59:38.129Z",
-  "correlationId": "4aafe9-4a40-a7fb-6e788d2497f7",
+  "id": "JEZfPklZ4H0ygmoqZFUd",
+  "createdAt": "2018-01-28T19:17:24.725Z",
   "status": "executed",
   "results": {
-    "recipientEthAddress": "ARNJJruY6RcuYCXcwWsu4bx9kyZtntqeAx",
-    "depositArkAddress": "5b83337a5af30bba26a55830a7d0ccf69114137ff699a3d718699ba1f498d77b",
+    "recipientEthAddress": "0xcfd866733c2192311add9836f0e0cf50daba16a7",
+    "depositArkAddress": "Aa1aGP6aF8z1LqYiNB8P86ozzfZ3TRFjBV",
     "transfers": []
   }
 }
@@ -104,32 +103,32 @@ curl -X POST localhost:9190/contracts \
 Get Contract information after sending ARK funds to `depositArkAddress`:
 
 ```bash
-curl -X GET http://localhost:9190/contracts/{id}
+curl -X GET http://localhost:9190/contracts/JEZfPklZ4H0ygmoqZFUd
 ```
 
 ```json
 {
-  "id": "abe05cd7-40c2-4fb0-a4a7-8d2f76e74978",
-  "createdAt": "2017-07-04T21:59:38.129Z",
-  "correlationId": "4aafe9-4a40-a7fb-6e788d2497f7",
-  "status": "executed",
-  "results": {
-    "recipientEthAddress": "ARNJJruY6RcuYCXcwWsu4bx9kyZtntqeAx",
-    "depositArkAddress": "5b83337a5af30bba26a55830a7d0ccf69114137ff699a3d718699ba1f498d77b",
-    "transfers": [
-      {
-          "id": "fa046b0e-7b05-4a2d-a4c9-168951df3b90",
-          "createdAt": "2017-07-05T21:00:38.457Z",
-          "arkTransactionId": "49f55381c5c3c70f96e848df53ab7f9ae9881dbb8eb43e8f91f642018bf1258f",
-          "arkAmount": "1.00000",
-          "arkToEthRate": "0.00622",
-          "arkFlatFee": "0.00000",
-          "arkPercentFee": "1.00000",
-          "arkTotalFee": "0.01000",
-          "ethTransactionId": "49f55381c5c3c70f96e848df53ab7f9ae9881dbb8eb43e8f91f642018bf1258f",
-          "ethSendAmount": "0.0062822"
-      }
-    ]
-  }
+    "id": "JEZfPklZ4H0ygmoqZFUd",
+    "createdAt": "2018-01-28T19:17:24.725Z",
+    "status": "executed",
+    "results": {
+        "recipientEthAddress": "0xcfd866733c2192311add9836f0e0cf50daba16a7",
+        "depositArkAddress": "Aa1aGP6aF8z1LqYiNB8P86ozzfZ3TRFjBV",
+        "transfers": [
+            {
+                "id": "JkvWCbxitSM6RC2FsxnJ",
+                "status": "complete",
+                "createdAt": "2018-01-28T20:03:54.753Z",
+                "arkTransactionId": "262facac6267e84951a6c92416bd11dc31bda787271e77ab3ec3aef48aadc33e",
+                "arkAmount": "0.10000000",
+                "arkToEthRate": "0.00535500",
+                "arkFlatFee": "0.00000000",
+                "arkPercentFee": "1.00000000",
+                "arkTotalFee": "0.00100000",
+                "ethTransactionId": "0x009f710213ca3088d8e18cd7184f5b90c007bd1980895324bb633452bf94428f",
+                "ethSendAmount": "0.00053550"
+            }
+        ]
+    }
 }
 ```

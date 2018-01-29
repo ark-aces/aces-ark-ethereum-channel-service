@@ -4,6 +4,7 @@ import com.arkaces.aces_server.common.json.NiceObjectMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -14,6 +15,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -27,8 +30,22 @@ public class EthereumService {
     private final EthereumRpcRequestFactory ethereumRpcRequestFactory = new EthereumRpcRequestFactory();
     private final RestTemplate ethereumRpcRestTemplate;
 
+    public BigDecimal getBalance(String address) {
+        HttpEntity<String> requestEntity = getRequestEntity("eth_getBalance", Arrays.asList(address, "latest"));
+        String balanceHex = ethereumRpcRestTemplate.exchange(
+                "/",
+                HttpMethod.POST,
+                requestEntity,
+                new ParameterizedTypeReference<EthereumRpcResponse<String>>() {}
+        ).getBody().getResult();
+
+        BigInteger wei = new BigInteger(balanceHex.replaceFirst("0x", ""), 16);
+
+        return ethereumWeiService.toEther(wei);
+    }
+
     public String sendTransaction(String from, String to, BigDecimal etherValue) {
-        Long wei = ethereumWeiService.toWei(etherValue);
+        BigInteger wei = ethereumWeiService.toWei(etherValue);
         String value = getHexStringFromWei(wei);
         SendTransaction sendTransaction = SendTransaction.builder()
                 .from(from)
@@ -44,8 +61,8 @@ public class EthereumService {
         ).getBody().getResult();
     }
 
-    private String getHexStringFromWei(Long wei) {
-        return "0x" + removeLeadingZeros(Long.toHexString(wei));
+    private String getHexStringFromWei(BigInteger wei) {
+        return "0x" + removeLeadingZeros(wei.toString(16));
     }
 
     private String removeLeadingZeros(String s) {

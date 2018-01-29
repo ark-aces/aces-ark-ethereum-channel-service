@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.Collections;
 
 @RestController
 @Slf4j
@@ -36,7 +37,6 @@ public class ArkEventHandler {
 
     @PostMapping("/arkEvents")
     public ResponseEntity<Void> handleArkEvent(@RequestBody ArkEventPayload eventPayload) {
-        // TODO: Verify event post is signed by listener.
         String arkTransactionId = eventPayload.getTransactionId();
         ArkTransaction transaction = eventPayload.getTransaction();
 
@@ -45,9 +45,6 @@ public class ArkEventHandler {
         String subscriptionId = eventPayload.getSubscriptionId();
         ContractEntity contractEntity = contractRepository.findOneBySubscriptionId(subscriptionId);
         if (contractEntity != null) {
-            // TODO: Lock contract for update to prevent concurrent processing of a listener transaction.
-            // Listeners send events serially, so that shouldn't be an issue, but we might want to lock to be safe.
-
             log.info("Matched event for contract id {}, ark transaction id {}", contractEntity.getId(), arkTransactionId);
 
             TransferEntity transferEntity = new TransferEntity();
@@ -84,36 +81,43 @@ public class ArkEventHandler {
 
             transferRepository.save(transferEntity);
 
-            // TODO: Make sure service wallet has enough funds.
-
-            // Send eth transaction
-            String ethTransactionId = ethereumService.sendTransaction(
-                    serviceEthAccountSettings.getAddress(),
-                    contractEntity.getRecipientEthAddress(),
-                    ethSendAmount
-            );
-
-            // Check if eth transaction was successful
-            if (ethTransactionId != null) {
-                transferEntity.setEthTransactionId(ethTransactionId);
-
-                log.info("Sent {} ETH to {}, eth transaction id {}, ark transaction id {}",
-                        ethSendAmount.toPlainString(),
+            // Check that service has enough eth to send
+            BigDecimal serviceAvailableEth = ethereumService.getBalance(serviceEthAccountSettings.getAddress());
+            if (ethSendAmount.compareTo(serviceAvailableEth) < 0) {
+                // Send eth transaction
+                String ethTransactionId = ethereumService.sendTransaction(
+                        serviceEthAccountSettings.getAddress(),
                         contractEntity.getRecipientEthAddress(),
-                        ethTransactionId,
-                        arkTransactionId
+                        ethSendAmount
                 );
 
-                transferEntity.setStatus(TransferStatus.COMPLETE.getStatus());
+                // Check if eth transaction was successful
+                if (ethTransactionId != null) {
+                    transferEntity.setEthTransactionId(ethTransactionId);
+
+                    log.info("Sent {} ETH to {}, eth transaction id {}, ark transaction id {}",
+                            ethSendAmount.toPlainString(),
+                            contractEntity.getRecipientEthAddress(),
+                            ethTransactionId,
+                            arkTransactionId
+                    );
+
+                    transferEntity.setStatus(TransferStatus.COMPLETE.getStatus());
+                } else {
+                    log.error("Failed to send {} ETH to {}, ark transaction id {}",
+                            ethSendAmount.toPlainString(),
+                            contractEntity.getRecipientEthAddress(),
+                            arkTransactionId
+                    );
+
+                    transferEntity.setStatus(TransferStatus.FAILED.getStatus());
+                }
             } else {
-                log.error("Failed to send {} ETH to {}, ark transaction id {}",
-                        ethSendAmount.toPlainString(),
-                        contractEntity.getRecipientEthAddress(),
-                        arkTransactionId
-                );
-
+                log.warn("Service account has insufficient eth to send transfer " + transferId
+                        + ": available = " + serviceAvailableEth + ", ethSendAmount = " + ethSendAmount);
                 transferEntity.setStatus(TransferStatus.FAILED.getStatus());
             }
+
 
             transferRepository.save(transferEntity);
 

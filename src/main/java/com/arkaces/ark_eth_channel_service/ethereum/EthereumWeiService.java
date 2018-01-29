@@ -10,14 +10,13 @@ public class EthereumWeiService {
 
     private final BigInteger WEI_PER_ETHER = new BigInteger("1000000000000000000");
 
-    public Long toWei(BigDecimal etherAmount) {
+    public BigInteger toWei(BigDecimal etherAmount) {
         return etherAmount
                 .multiply(new BigDecimal(WEI_PER_ETHER))
-                .toBigIntegerExact()
-                .longValue();
+                .toBigIntegerExact();
     }
 
-    public BigDecimal toEther(Long wei) {
+    public BigDecimal toEther(BigInteger wei) {
         return new BigDecimal(wei)
                 .setScale(18, BigDecimal.ROUND_UP)
                 .divide(new BigDecimal(WEI_PER_ETHER), BigDecimal.ROUND_UP);
