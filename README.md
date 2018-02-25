@@ -2,6 +2,12 @@
 
 ACES ARK to ETH transfer channel service
 
+## Run Application
+
+```
+mvn spring-boot:run
+```
+
 ## Using Service
 
 Get service info:
