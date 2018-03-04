@@ -1,5 +1,6 @@
 package com.arkaces.ark_eth_channel_service.contract;
 
+import ark_java_client.ArkClient;
 import com.arkaces.ApiException;
 import com.arkaces.aces_listener_api.AcesListenerApi;
 import com.arkaces.aces_server.aces_service.contract.Contract;
@@ -9,12 +10,10 @@ import com.arkaces.aces_server.aces_service.error.ServiceErrorCodes;
 import com.arkaces.aces_server.common.api_key_generation.ApiKeyGenerator;
 import com.arkaces.aces_server.common.error.NotFoundException;
 import com.arkaces.aces_server.common.identifer.IdentifierGenerator;
-import io.ark.core.Crypto;
 import io.swagger.client.model.Subscription;
 import io.swagger.client.model.SubscriptionRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.bitcoinj.core.ECKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -34,6 +33,7 @@ public class ContractController {
     private final String arkEventCallbackUrl;
     private final Integer arkMinConfirmations;
     private final ApiKeyGenerator apiKeyGenerator;
+    private final ArkClient arkClient;
     
     @PostMapping("/contracts")
     public Contract<Results> postContract(@RequestBody CreateContractRequest<Arguments> createContractRequest) {
@@ -47,8 +47,7 @@ public class ContractController {
         // Generate ark wallet for deposits
         String depositArkPassphrase = apiKeyGenerator.generate();
         contractEntity.setDepositArkPassphrase(depositArkPassphrase);
-        ECKey key = Crypto.getKeys(depositArkPassphrase);
-        String depositArkAddress = Crypto.getAddress(key);
+        String depositArkAddress = arkClient.getAddress(depositArkPassphrase);
         contractEntity.setDepositArkAddress(depositArkAddress);
         log.info("Deposit Ark Address: {} --- Deposit Ark Passphrase: {}", depositArkAddress, depositArkPassphrase);
 
