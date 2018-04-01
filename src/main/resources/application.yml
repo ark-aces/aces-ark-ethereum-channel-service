@@ -13,7 +13,9 @@ serverInfo:
       "type": "object",
       "properties": {
         "recipientEthAddress": {
-          "type": "string"
+          "type": "string",
+          "title": "Recipient ETH Address",
+          "description": "Enter the ETH address to receive transfers."
         }
       },
       "required": [
