@@ -89,7 +89,9 @@ Create a new Service Contract:
 curl -X POST localhost:9190/contracts \
 -H 'Content-type: application/json' \
 -d '{
-  "recipientEthAddress": "0xcfd866733c2192311add9836f0e0cf50daba16a7"
+  "arguments": {
+    "recipientEthAddress": "0xcfd866733c2192311add9836f0e0cf50daba16a7"
+  }
 }' 
 ```
 
