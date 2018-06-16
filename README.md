@@ -4,9 +4,13 @@ ACES ARK to ETH transfer channel service
 
 ## Run Application
 
-```
-mvn spring-boot:run
-```
+1. Setup configuration in `application.yml`
+2. Start service: `mvn spring-boot:run`
+
+### Want to run via docker?
+
+1. Set correct environment variables in `docker-compose.yml`
+2. Start service: `docker-compose up`
 
 ## Using Service
 
@@ -92,7 +96,7 @@ curl -X POST localhost:9190/contracts \
   "arguments": {
     "recipientEthAddress": "0xcfd866733c2192311add9836f0e0cf50daba16a7"
   }
-}' 
+}'
 ```
 
 ```json
