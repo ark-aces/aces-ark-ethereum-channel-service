@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  ark-eth-channel:
+    build:
+      context: .
+    command: mvn spring-boot:run
+    environment:
+      EVENT_CALLBACK_URL: "http://localhost:9190/arkEvents"
+      APP_PORT: 9190
+      SERVICE_ETH_ADDRESS: "<your eth address that holds all the ETH>"
+      SERVICE_FLAT_FEE: 0
+      SERVICE_PERCENT_FEE: 1
+      ETH_RPC_URL: "http://localhost:8545"
+      ARK_MIN_CONFIRMATIONS: 5
+      ARK_LISTENER_URL: "http://<your-ark-listener>:9091"
+    volumes:
+      - ark-eth-channel:/app
+    expose:
+      - "9190"
+    ports:
+      - "9190:9190"
+
+volumes:
+  ark-eth-channel:

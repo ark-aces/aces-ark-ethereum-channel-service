@@ -96,20 +96,20 @@ serverInfo:
 arkNetworkConfigPath: "ark_network_config/testnet.yml"
 
 serviceEthAccount:
-  address: "change-me"
+  address: ${SERVICE_ETH_ADDRESS}
 
 fees:
-  arkFlatFee: 0
-  arkPercentFee: 1
+  arkFlatFee: ${SERVICE_FLAT_FEE}
+  arkPercentFee: ${SERVICE_PERCENT_FEE}
 
 server:
-  port: 9190
+  port: ${APP_PORT}
 
 arkListener:
-  url: "https://ark-listener-mainnet.arkaces.com/"
+  url: ${ARK_LISTENER_URL}
 
-arkEventCallbackUrl: "http://localhost:9190/arkEvents"
+arkEventCallbackUrl: ${EVENT_CALLBACK_URL}
 
-arkMinConfirmations: 5
+arkMinConfirmations: ${ARK_MIN_CONFIRMATIONS}
 
-ethRpcRootUri: "http://127.0.0.1:8545"
+ethRpcRootUri: ${ETH_RPC_URL}
