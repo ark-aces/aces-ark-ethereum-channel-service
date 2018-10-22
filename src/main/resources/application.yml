@@ -1,3 +1,6 @@
+server:
+  port: 9190
+
 serverInfo:
   name: "Aces ARK-ETH Channel Service"
   description: "ACES ARK-ETH Channel service for transferring ARK to ETH"
@@ -119,6 +122,15 @@ serverInfo:
 #    hibernate:
 #      ddl-auto: validate
 #
+#  mail:
+#    host: "change-me"
+#    port: 587
+#    username: "change-me"
+#    password: "change-me"
+#    properties:
+#      mail.smtp.auth: true
+#      mail.startttls.enable: true
+#
 #flyway:
 #  enabled: true
 
@@ -131,9 +143,6 @@ fees:
   arkFlatFee: 0
   arkPercentFee: 1
 
-server:
-  port: 9190
-
 arkListener:
   url: "https://ark-listener-mainnet.arkaces.com/"
 
@@ -142,3 +151,12 @@ arkEventCallbackUrl: "http://localhost:9190/arkEvents"
 arkMinConfirmations: 5
 
 ethRpcRootUri: "http://127.0.0.1:8545"
+
+# Send notifications on low capacity and transfer completed/failed
+notifications:
+  enabled: false
+  recipientEmailAddress: "change_me"
+  fromEmailAddress: "change_me"
+
+# Capacity threshold at which low capacity notifications will be sent
+lowCapacityThreshold: "1.00"
