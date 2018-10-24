@@ -1,6 +1,7 @@
 package com.arkaces.ark_eth_channel_service.transfer;
 
 import com.arkaces.aces_server.common.identifer.IdentifierGenerator;
+import com.arkaces.aces_server.aces_service.notification.NotificationService;
 import com.arkaces.ark_eth_channel_service.FeeSettings;
 import com.arkaces.ark_eth_channel_service.ServiceEthAccountSettings;
 import com.arkaces.ark_eth_channel_service.ark.ArkSatoshiService;
@@ -34,6 +35,8 @@ public class ArkEventHandler {
     private final ServiceEthAccountSettings serviceEthAccountSettings;
     private final FeeSettings feeSettings;
     private final EthereumService ethereumService;
+    private final NotificationService notificationService;
+    private final BigDecimal lowCapacityThreshold;
 
     @PostMapping("/arkEvents")
     public ResponseEntity<Void> handleArkEvent(@RequestBody ArkEventPayload eventPayload) {
@@ -103,21 +106,42 @@ public class ArkEventHandler {
                     );
 
                     transferEntity.setStatus(TransferStatus.COMPLETE.getStatus());
-                } else {
-                    log.error("Failed to send {} ETH to {}, ark transaction id {}",
-                            ethSendAmount.toPlainString(),
-                            contractEntity.getRecipientEthAddress(),
-                            arkTransactionId
+
+                    notificationService.notifySuccessfulTransfer(
+                            transferEntity.getContractEntity().getId(),
+                            transferEntity.getId()
                     );
 
+                } else {
+                    String message = "Failed to send " + ethSendAmount.toPlainString() +
+                            " ETH to " + contractEntity.getRecipientEthAddress() +
+                            ", ark transaction id " + arkTransactionId;
+
+                    log.error(message);
+
                     transferEntity.setStatus(TransferStatus.FAILED.getStatus());
+
+                    notificationService.notifyFailedTransfer(
+                            transferEntity.getContractEntity().getId(),
+                            transferEntity.getId(),
+                            message
+                    );
                 }
             } else {
-                log.warn("Service account has insufficient eth to send transfer " + transferId
-                        + ": available = " + serviceAvailableEth + ", ethSendAmount = " + ethSendAmount);
-                transferEntity.setStatus(TransferStatus.FAILED.getStatus());
-            }
+                String message = "Failed to send transfer " + transferId + " due to insufficient service ark: available = "
+                        + serviceAvailableEth + ", send amount: " + ethSendAmount;
 
+                log.warn(message);
+
+                transferEntity.setStatus(TransferStatus.FAILED.getStatus());
+
+                notificationService.notifyFailedTransfer(
+                        transferEntity.getContractEntity().getId(),
+                        transferEntity.getId(),
+                        message
+                );
+
+            }
 
             transferRepository.save(transferEntity);
 
