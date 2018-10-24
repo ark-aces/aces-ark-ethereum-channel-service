@@ -113,9 +113,9 @@ public class ArkEventHandler {
                     );
 
                 } else {
-                    String message = ("Failed to send " + ethSendAmount.toPlainString() +
+                    String message = "Failed to send " + ethSendAmount.toPlainString() +
                             " ETH to " + contractEntity.getRecipientEthAddress() +
-                            ", ark transaction id " + arkTransactionId);
+                            ", ark transaction id " + arkTransactionId;
 
                     log.error(message);
 
